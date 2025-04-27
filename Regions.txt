@@ -1,0 +1,5 @@
+Region,RegionManager
+North,Manager_North
+South,Manager_South
+East,Manager_East
+West,Manager_West

@@ -1,0 +1,11 @@
+CustomerID,CustomerName,City
+C101,John,Delhi
+C102,Alice,Mumbai
+C103,Bob,Kolkata
+C104,Charlie,Chennai
+C105,Diana,Delhi
+C106,Eve,Mumbai
+C107,Frank,Kolkata
+C108,Grace,Chennai
+C109,Hank,Delhi
+C110,Ivy,Mumbai

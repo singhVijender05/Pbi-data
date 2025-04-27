@@ -1,0 +1,11 @@
+ProductID,ProductName,Brand
+P501,Laptop,Dell
+P502,Smartphone,Samsung
+P503,Chair,Ikea
+P504,Table,Ikea
+P505,T-Shirt,Nike
+P506,Jeans,Levis
+P507,Headphones,Sony
+P508,Couch,Urban Ladder
+P509,Jacket,Adidas
+P510,Camera,Canon
