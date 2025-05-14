@@ -1,0 +1,30 @@
+WITH person_sets AS (
+  SELECT
+    comm_date,
+    created_by_id,
+    LISTAGG(DISTINCT person_id, ',' ON OVERFLOW TRUNCATE) WITHIN GROUP (ORDER BY person_id) AS person_set
+  FROM communication
+  GROUP BY comm_date, created_by_id
+),
+repeated_sets AS (
+  SELECT person_set
+  FROM person_sets
+  GROUP BY person_set
+  HAVING COUNT(*) > 1
+)
+
+, group_signature AS (
+  SELECT
+    comm_date,
+    created_by_id,
+    LISTAGG(DISTINCT person_id, ',' ON OVERFLOW TRUNCATE) WITHIN GROUP (ORDER BY person_id) AS person_set
+  FROM communication
+  GROUP BY comm_date, created_by_id
+)
+SELECT c.*
+FROM communication c
+JOIN group_signature g
+  ON c.comm_date = g.comm_date
+  AND c.created_by_id = g.created_by_id
+JOIN repeated_sets r
+  ON g.person_set = r.person_set;
