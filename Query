@@ -1,0 +1,29 @@
+WITH person_sets AS (
+  SELECT
+    comm_date,
+    created_by_id,
+    STRING_AGG(DISTINCT person_id::TEXT, ',' ORDER BY person_id) AS person_set,
+    COUNT(DISTINCT comm_id) AS comm_count
+  FROM communication
+  GROUP BY comm_date, created_by_id
+),
+matching_sets AS (
+  SELECT person_set
+  FROM person_sets
+  GROUP BY person_set
+  HAVING COUNT(*) > 1
+)
+SELECT c.*
+FROM communication c
+JOIN (
+    SELECT
+      comm_date,
+      created_by_id,
+      STRING_AGG(DISTINCT person_id::TEXT, ',' ORDER BY person_id) AS person_set
+    FROM communication
+    GROUP BY comm_date, created_by_id
+) grouped_comm
+  ON c.comm_date = grouped_comm.comm_date
+  AND c.created_by_id = grouped_comm.created_by_id
+JOIN matching_sets ms
+  ON grouped_comm.person_set = ms.person_set;
