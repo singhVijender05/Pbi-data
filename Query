@@ -40,7 +40,24 @@ CALCULATE (
 
 
 
-IsDuplicate_Criteria1 =
-VAR sig = Interaction[DuplicateSignature1]
+DuplicateInteractionFlag1 =
+VAR CurrentSignature =
+    CONCATENATE (
+        FORMAT ( Interaction[meeting_date], "YYYY-MM-DD" ),
+        "|" & RELATED ( Client[client_name] ) & "|" & RELATED ( Contact[full_name] )
+    )
+
+VAR DuplicateCount =
+    CALCULATE (
+        COUNTROWS ( Interaction ),
+        FILTER (
+            ALL ( Interaction ),
+            CONCATENATE (
+                FORMAT ( Interaction[meeting_date], "YYYY-MM-DD" ),
+                "|" & RELATED ( Client[client_name] ) & "|" & RELATED ( Contact[full_name] )
+            ) = CurrentSignature
+        )
+    )
+
 RETURN
-    CALCULATE(COUNTROWS(Interaction), Interaction[DuplicateSignature1] = sig) > 1
+    IF ( DuplicateCount > 1, 1, 0 )
