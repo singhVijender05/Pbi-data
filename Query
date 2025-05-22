@@ -1,12 +1,15 @@
 CommParticipantSignature =
 ADDCOLUMNS (
-    SUMMARIZE (CommParticipants, CommParticipants[comm_id]),
+    SUMMARIZE ( CommParticipants, CommParticipants[comm_id] ),
     "ParticipantKey",
-        CONCATENATEX (
-            VALUES (CommParticipants[per_id]),
-            CommParticipants[per_id],
-            "|",
-            ASC
+        CALCULATE (
+            CONCATENATEX (
+                VALUES ( Contact[FullName] ),
+                Contact[FullName],
+                "|",
+                ASC
+            ),
+            USERELATIONSHIP ( CommParticipants[per_id], Contact[row_id] )
         )
 )
 
