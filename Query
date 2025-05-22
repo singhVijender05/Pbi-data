@@ -1,48 +1,28 @@
-CommParticipants =
-UNION (
-    SELECTCOLUMNS (
-        comm_emp,
-        "comm_id", comm_emp[comm_id],
-        "per_id", comm_emp[emp_id]
-    ),
-    SELECTCOLUMNS (
-        comm_con,
-        "comm_id", comm_con[comm_id],
-        "per_id", comm_con[per_id]
+InteractionsWithOnlyInactiveEmployees :=
+COUNTROWS (
+    FILTER (
+        ADDCOLUMNS (
+            VALUES ( comm_emp[comm_id] ),
+            "ActiveCount", CALCULATE (
+                COUNTROWS ( comm_emp ),
+                FILTER (
+                    comm_emp,
+                    LOWER(RELATED(Contact[x_status])) = "active"
+                )
+            ),
+            "InactiveCount", CALCULATE (
+                COUNTROWS ( comm_emp ),
+                FILTER (
+                    comm_emp,
+                    LOWER(RELATED(Contact[x_status])) = "inactive"
+                )
+            ),
+            "TotalCount", CALCULATE (
+                COUNTROWS ( comm_emp )
+            )
+        ),
+        [ActiveCount] = 0 &&
+        [InactiveCount] > 0 &&
+        [ActiveCount] + [InactiveCount] > 0  -- exclude blanks only
     )
 )
-
-
-CommParticipantSignature =
-ADDCOLUMNS (
-    SUMMARIZE ( CommParticipants, CommParticipants[comm_id] ),
-    "ParticipantKey",
-        CONCATENATEX (
-            VALUES ( CommParticipants[per_id] ),
-            CommParticipants[per_id],
-            "|",
-            ASC
-        )
-)
-
-
-InteractionKey_Participant =
-Interaction[created_date] & "|" &
-RELATED(Client[name]) & "|" &
-RELATED(CommParticipantSignature[ParticipantKey])
-
-
-ParticipantBasedDuplicateCount =
-VAR DuplicateGroups =
-    ADDCOLUMNS (
-        SUMMARIZE ( Interaction, [InteractionKey_Participant] ),
-        "DupCount",
-            CALCULATE ( COUNTROWS ( Interaction ) )
-    )
-RETURN
-SUMX (
-    FILTER ( DuplicateGroups, [DupCount] > 1 ),
-    [DupCount]
-)
-
-
