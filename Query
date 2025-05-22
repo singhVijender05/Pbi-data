@@ -1,18 +1,40 @@
-InteractionsWithMissingCRMAccess :=
-COUNTROWS (
-    FILTER (
-        VALUES ( comm_emp[comm_id] ),
-        CALCULATE (
-            COUNTROWS ( comm_emp ),
-            FILTER (
-                comm_emp,
-                ISBLANK (
-                    LOOKUPVALUE (
-                        access_list[resp_id],
-                        access_list[per_id], comm_emp[emp_id]
-                    )
-                )
-            )
-        ) > 0
-    )
+CommParticipantSignature =
+ADDCOLUMNS (
+    SUMMARIZE (CommParticipants, CommParticipants[comm_id]),
+    "ParticipantKey",
+        CONCATENATEX (
+            VALUES (CommParticipants[per_id]),
+            CommParticipants[per_id],
+            "|",
+            ASC
+        )
 )
+
+
+
+
+ParticipantSignature =
+FORMAT(Interaction[meeting_date], "YYYY-MM-DD") & "|" &
+RELATED(Client[client name]) & "|" &
+RELATED(CommParticipantSignature[ParticipantKey])
+
+
+IsDuplicate_Criteria2 =
+VAR currentSignature = Interaction[ParticipantSignature]
+RETURN
+CALCULATE (
+    COUNTROWS ( Interaction ),
+    FILTER (
+        ALL ( Interaction ),
+        Interaction[ParticipantSignature] = currentSignature
+    )
+) > 1
+
+
+
+
+
+IsDuplicate_Criteria1 =
+VAR sig = Interaction[DuplicateSignature1]
+RETURN
+    CALCULATE(COUNTROWS(Interaction), Interaction[DuplicateSignature1] = sig) > 1
