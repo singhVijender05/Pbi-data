@@ -1,23 +1,17 @@
-InteractionsWithOnlyLeftEmployees :=
+InteractionsWithMissingCRMAccess :=
 COUNTROWS (
     FILTER (
         VALUES ( comm_emp[comm_id] ),
-        -- Count employees with non-blank status that are active
         CALCULATE (
             COUNTROWS ( comm_emp ),
             FILTER (
                 comm_emp,
-                NOT ISBLANK(RELATED(Contact[x_status]))
-                    && LOWER(RELATED(Contact[x_status])) = "active"
-            )
-        ) = 0
-        &&
-        -- Count employees with non-blank status (active or inactive)
-        CALCULATE (
-            COUNTROWS ( comm_emp ),
-            FILTER (
-                comm_emp,
-                NOT ISBLANK(RELATED(Contact[x_status]))
+                ISBLANK (
+                    LOOKUPVALUE (
+                        access_list[resp_id],
+                        access_list[per_id], comm_emp[emp_id]
+                    )
+                )
             )
         ) > 0
     )
