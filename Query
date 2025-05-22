@@ -4,10 +4,13 @@ ADDCOLUMNS (
     "ParticipantKey",
         CALCULATE (
             CONCATENATEX (
-                VALUES ( Contact[FullName] ),
-                Contact[FullName],
+                SELECTCOLUMNS (
+                    VALUES ( Contact[FullName] ),
+                    "Name", Contact[FullName]
+                ),
+                [Name],
                 "|",
-                ASC
+                [Name]
             ),
             USERELATIONSHIP ( CommParticipants[per_id], Contact[row_id] )
         )
