@@ -1,28 +1,24 @@
-InteractionsWithOnlyInactiveEmployees :=
+InteractionsWithOnlyLeftEmployees :=
 COUNTROWS (
     FILTER (
-        ADDCOLUMNS (
-            VALUES ( comm_emp[comm_id] ),
-            "ActiveCount", CALCULATE (
-                COUNTROWS ( comm_emp ),
-                FILTER (
-                    comm_emp,
-                    LOWER(RELATED(Contact[x_status])) = "active"
-                )
-            ),
-            "InactiveCount", CALCULATE (
-                COUNTROWS ( comm_emp ),
-                FILTER (
-                    comm_emp,
-                    LOWER(RELATED(Contact[x_status])) = "inactive"
-                )
-            ),
-            "TotalCount", CALCULATE (
-                COUNTROWS ( comm_emp )
+        VALUES ( comm_emp[comm_id] ),
+        -- Count employees with non-blank status that are active
+        CALCULATE (
+            COUNTROWS ( comm_emp ),
+            FILTER (
+                comm_emp,
+                NOT ISBLANK(RELATED(Contact[x_status]))
+                    && LOWER(RELATED(Contact[x_status])) = "active"
             )
-        ),
-        [ActiveCount] = 0 &&
-        [InactiveCount] > 0 &&
-        [ActiveCount] + [InactiveCount] > 0  -- exclude blanks only
+        ) = 0
+        &&
+        -- Count employees with non-blank status (active or inactive)
+        CALCULATE (
+            COUNTROWS ( comm_emp ),
+            FILTER (
+                comm_emp,
+                NOT ISBLANK(RELATED(Contact[x_status]))
+            )
+        ) > 0
     )
 )
