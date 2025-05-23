@@ -1,63 +1,14 @@
-CommParticipantSignature =
-ADDCOLUMNS (
-    SUMMARIZE ( CommParticipants, CommParticipants[comm_id] ),
-    "ParticipantKey",
-        CALCULATE (
-            CONCATENATEX (
-                SELECTCOLUMNS (
-                    VALUES ( Contact[FullName] ),
-                    "Name", Contact[FullName]
-                ),
-                [Name],
-                "|",
-                [Name]
+Interactions_With_All_InactiveEmp :=
+CALCULATETABLE (
+    VALUES ( interaction[comm_id] ),
+    NOT ISEMPTY (
+        SELECTCOLUMNS (
+            FILTER (
+                comm_emp,
+                RELATED ( contact[x_status] ) <> "Active"
+                    || ISBLANK ( RELATED ( contact[x_status] ) )
             ),
-            USERELATIONSHIP ( CommParticipants[per_id], Contact[row_id] )
+            "comm_id", comm_emp[comm_id]
         )
+    )
 )
-
-
-
-
-ParticipantSignature =
-FORMAT(Interaction[meeting_date], "YYYY-MM-DD") & "|" &
-RELATED(Client[client name]) & "|" &
-RELATED(CommParticipantSignature[ParticipantKey])
-
-
-IsDuplicate_Criteria2 =
-VAR currentSignature = Interaction[ParticipantSignature]
-RETURN
-CALCULATE (
-    COUNTROWS ( Interaction ),
-    FILTER (
-        ALL ( Interaction ),
-        Interaction[ParticipantSignature] = currentSignature
-    )
-) > 1
-
-
-
-
-
-DuplicateInteractionFlag1 =
-VAR CurrentSignature =
-    CONCATENATE (
-        FORMAT ( Interaction[meeting_date], "YYYY-MM-DD" ),
-        "|" & RELATED ( Client[client_name] ) & "|" & RELATED ( Contact[full_name] )
-    )
-
-VAR DuplicateCount =
-    CALCULATE (
-        COUNTROWS ( Interaction ),
-        FILTER (
-            ALL ( Interaction ),
-            CONCATENATE (
-                FORMAT ( Interaction[meeting_date], "YYYY-MM-DD" ),
-                "|" & RELATED ( Client[client_name] ) & "|" & RELATED ( Contact[full_name] )
-            ) = CurrentSignature
-        )
-    )
-
-RETURN
-    IF ( DuplicateCount > 1, 1, 0 )
