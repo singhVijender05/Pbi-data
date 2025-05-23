@@ -1,14 +1,43 @@
-Interactions_With_All_InactiveEmp :=
-CALCULATETABLE (
-    VALUES ( interaction[comm_id] ),
-    NOT ISEMPTY (
-        SELECTCOLUMNS (
-            FILTER (
-                comm_emp,
-                RELATED ( contact[x_status] ) <> "Active"
-                    || ISBLANK ( RELATED ( contact[x_status] ) )
-            ),
-            "comm_id", comm_emp[comm_id]
-        )
+Past25DaysInteractionCount :=
+CALCULATE (
+    COUNTROWS ( Interaction ),
+    FILTER (
+        Interaction,
+        Interaction[Meeting Date] >= TODAY() - 25 &&
+        Interaction[Meeting Date] <= TODAY()
+    )
+)
+
+Past4MonthsInteractionCount :=
+CALCULATE (
+    COUNTROWS ( Interaction ),
+    FILTER (
+        Interaction,
+        Interaction[Meeting Date] >= EDATE(TODAY(), -4) &&
+        Interaction[Meeting Date] <= TODAY()
+    )
+)
+
+
+
+
+Past10MonthsInteractionCount :=
+CALCULATE (
+    COUNTROWS ( Interaction ),
+    FILTER (
+        Interaction,
+        Interaction[Meeting Date] >= EDATE(TODAY(), -10) &&
+        Interaction[Meeting Date] <= TODAY()
+    )
+)
+
+
+Upcoming10DaysInteractionCount :=
+CALCULATE (
+    COUNTROWS ( Interaction ),
+    FILTER (
+        Interaction,
+        Interaction[Meeting Date] > TODAY() &&
+        Interaction[Meeting Date] <= TODAY() + 10
     )
 )
