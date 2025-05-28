@@ -1,30 +1,83 @@
-WITH person_sets AS (
-  SELECT
-    comm_date,
-    created_by_id,
-    LISTAGG(DISTINCT person_id, ',' ON OVERFLOW TRUNCATE) WITHIN GROUP (ORDER BY person_id) AS person_set
-  FROM communication
-  GROUP BY comm_date, created_by_id
-),
-repeated_sets AS (
-  SELECT person_set
-  FROM person_sets
-  GROUP BY person_set
-  HAVING COUNT(*) > 1
-)
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Selenium Suite">
+    <test name="Scenarios">
+        <classes>
+            <class name="tests.SeleniumScenariosTest"/>
+        </classes>
+    </test>
+</suite>
 
-, group_signature AS (
-  SELECT
-    comm_date,
-    created_by_id,
-    LISTAGG(DISTINCT person_id, ',' ON OVERFLOW TRUNCATE) WITHIN GROUP (ORDER BY person_id) AS person_set
-  FROM communication
-  GROUP BY comm_date, created_by_id
-)
-SELECT c.*
-FROM communication c
-JOIN group_signature g
-  ON c.comm_date = g.comm_date
-  AND c.created_by_id = g.created_by_id
-JOIN repeated_sets r
-  ON g.person_set = r.person_set;
+
+package tests;
+
+import config.ConfigReader;
+import utils.SeleniumUtils;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.annotations.*;
+import java.time.Duration;
+import static org.testng.Assert.*;
+
+public class SeleniumScenariosTest {
+    WebDriver driver;
+    SeleniumUtils utils;
+
+    @BeforeClass
+    public void setup() {
+        System.setProperty("webdriver.chrome.driver", ConfigReader.get("chromeDriverPath"));
+        driver = new ChromeDriver();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(
+                Integer.parseInt(ConfigReader.get("implicitWait"))));
+        driver.manage().window().maximize();
+        driver.get(ConfigReader.get("baseUrl"));
+        utils = new SeleniumUtils(driver);
+    }
+
+    @Test
+    public void testScenario1() {
+        try {
+            // Implement test step 1
+            assertTrue(true); // dummy assertion
+        } catch (Exception e) {
+            fail("Scenario 1 failed: " + e.getMessage());
+        }
+    }
+
+    @AfterClass
+    public void cleanup() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+}
+
+
+
+package utils;
+
+import org.openqa.selenium.*;
+
+public class SeleniumUtils {
+    WebDriver driver;
+
+    public SeleniumUtils(WebDriver driver) {
+        this.driver = driver;
+    }
+
+    public WebElement byId(String id) {
+        return driver.findElement(By.id(id));
+    }
+
+    public WebElement byXpath(String xpath) {
+        return driver.findElement(By.xpath(xpath));
+    }
+
+    public void click(WebElement element) {
+        element.click();
+    }
+
+    public void sendKeys(WebElement element, String value) {
+        element.clear();
+        element.sendKeys(value);
+    }
+}
