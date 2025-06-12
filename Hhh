@@ -1,83 +1,20 @@
-<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Selenium Suite">
-    <test name="Scenarios">
-        <classes>
-            <class name="tests.SeleniumScenariosTest"/>
-        </classes>
-    </test>
-</suite>
+Subject: Immediate Resignation Due to Medical Reasons
 
+Dear [HR's Name],
 
-package tests;
+I hope this message finds you well.
 
-import config.ConfigReader;
-import utils.SeleniumUtils;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.testng.annotations.*;
-import java.time.Duration;
-import static org.testng.Assert.*;
+I regret to inform you that I have recently met with an accident and am currently under medical care. Due to the nature of my condition, I am advised to rest and remain with my family for proper recovery and support.
 
-public class SeleniumScenariosTest {
-    WebDriver driver;
-    SeleniumUtils utils;
+Given these unforeseen circumstances, I am left with no option but to tender my resignation from my current internship role with immediate effect. I have also attached the relevant medical documents for your reference.
 
-    @BeforeClass
-    public void setup() {
-        System.setProperty("webdriver.chrome.driver", ConfigReader.get("chromeDriverPath"));
-        driver = new ChromeDriver();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(
-                Integer.parseInt(ConfigReader.get("implicitWait"))));
-        driver.manage().window().maximize();
-        driver.get(ConfigReader.get("baseUrl"));
-        utils = new SeleniumUtils(driver);
-    }
+While I was already in the process of planning a transition due to a career opportunity in my hometown, this health situation has accelerated the need for immediate release.
 
-    @Test
-    public void testScenario1() {
-        try {
-            // Implement test step 1
-            assertTrue(true); // dummy assertion
-        } catch (Exception e) {
-            fail("Scenario 1 failed: " + e.getMessage());
-        }
-    }
+I sincerely thank you and the organization for the opportunity and the valuable experience I’ve gained during my time here. I truly appreciate your support and understanding in this matter.
 
-    @AfterClass
-    public void cleanup() {
-        if (driver != null) {
-            driver.quit();
-        }
-    }
-}
+Please let me know if any formalities are required from my end.
 
-
-
-package utils;
-
-import org.openqa.selenium.*;
-
-public class SeleniumUtils {
-    WebDriver driver;
-
-    public SeleniumUtils(WebDriver driver) {
-        this.driver = driver;
-    }
-
-    public WebElement byId(String id) {
-        return driver.findElement(By.id(id));
-    }
-
-    public WebElement byXpath(String xpath) {
-        return driver.findElement(By.xpath(xpath));
-    }
-
-    public void click(WebElement element) {
-        element.click();
-    }
-
-    public void sendKeys(WebElement element, String value) {
-        element.clear();
-        element.sendKeys(value);
-    }
-}
+Warm regards,
+Vijender Singh
+[Your Intern ID / Employee Code, if any]
+[Your Contact Number]
